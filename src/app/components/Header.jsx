@@ -3,15 +3,26 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Menu, X } from "lucide-react"
 
 const Header = () => {
   const [mounted, setMounted] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { theme, setTheme } = useTheme()
 
   useEffect(() => setMounted(true), [])
 
   if (!mounted) return null
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "#about", label: "About" },
+    { href: "#services", label: "Services" },
+    { href: "#portfolio", label: "Portfolio" },
+    { href: "#contact", label: "Contact" },
+  ]
 
   return (
     <header className="fixed w-full bg-white dark:bg-gray-900 z-10 transition-colors duration-300">
@@ -20,43 +31,55 @@ const Header = () => {
           <Link href="/" className="text-2xl font-bold text-primary">
             SoftZenix
           </Link>
-          <nav>
+          <nav className="hidden md:block">
             <ul className="flex space-x-4">
-              <li>
-                <Link href="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="#about" className="hover:text-primary transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="#services" className="hover:text-primary transition-colors">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link href="#portfolio" className="hover:text-primary transition-colors">
-                  Portfolio
-                </Link>
-              </li>
-              <li>
-                <Link href="#contact" className="hover:text-primary transition-colors">
-                  Contact
-                </Link>
-              </li>
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="hover:text-primary transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition-colors"
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <button
+              onClick={toggleMenu}
+              className="md:hidden p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
       </div>
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div className="md:hidden">
+          <nav className="px-2 pt-2 pb-4 bg-white dark:bg-gray-900">
+            <ul className="space-y-2">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="block px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                    onClick={toggleMenu}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
